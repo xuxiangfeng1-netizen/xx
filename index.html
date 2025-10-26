@@ -95,7 +95,7 @@ unCLIP decomposes the text-to-image task into two learnable parts:
 This hierarchical structure simplifies training and enhances controllability.
 </p>
 
-<img src="https://raw.githubusercontent.com/xuxiangfeng1-netizen/XUXIANGFENG.github.io/main/me.jpg" alt="unCLIP Model Overview">
+<img src="https://cdn.openai.com/research-covers/unclip/unclip-architecture.jpg" alt="unCLIP Model Overview">
 <p class="source">Figure 1: unCLIP model overview. Source: Ramesh et al., 2022.</p>
 
 <hr>
@@ -145,18 +145,7 @@ Human evaluation confirms that unCLIP balances photorealism and creativity effec
 
 <hr>
 
-<h2>7. Innovations Summary</h2>
-<table>
-  <tr><th>Innovation</th><th>Technique</th><th>Effect</th></tr>
-  <tr><td>Hierarchical Generation</td><td>Text → Embedding → Image</td><td>Improves semantic consistency</td></tr>
-  <tr><td>Diffusion Prior</td><td>Continuous latent modeling</td><td>Boosts quality and speed</td></tr>
-  <tr><td>Latent Visualization</td><td>CLIP decoding</td><td>Enhances interpretability</td></tr>
-  <tr><td>Classifier-Free Guidance</td><td>Conditional dropout</td><td>Balances fidelity and diversity</td></tr>
-</table>
-
-<hr>
-
-<h2>8. Limitations and Risks</h2>
+<h2>7. Limitations and Future Work</h2>
 <ul>
   <li>Attribute confusion (e.g., “a red cube on a blue cube”)</li>
   <li>Distorted text rendering</li>
@@ -164,26 +153,9 @@ Human evaluation confirms that unCLIP balances photorealism and creativity effec
   <li>Ethical concerns around realism and misinformation</li>
 </ul>
 
-<img src="https://cdn.openai.com/research-covers/unclip/unclip-failures.jpg" alt="unCLIP limitations">
-<p class="source">Figure 3: unCLIP limitations. Source: Ramesh et al., 2022.</p>
-
 <hr>
 
-<h2>9. Applications and Future Work</h2>
-<p>
-unCLIP has been integrated into OpenAI’s DALL·E 2, demonstrating its power in art, media, and content generation.
-Future directions include:
-</p>
-<ul>
-  <li>Higher base resolutions</li>
-  <li>Improved attribute–object binding</li>
-  <li>More controllable latent editing</li>
-  <li>Ethical safeguards and watermarking</li>
-</ul>
-
-<hr>
-
-<h2>10. Conclusion</h2>
+<h2>8. Conclusion</h2>
 <p>
 The unCLIP framework bridges semantic understanding and high-fidelity image generation.
 By leveraging CLIP latent representations and diffusion modeling, it achieves a new balance of accuracy, diversity, and interpretability—surpassing GLIDE and DALL·E in both creativity and visual quality.
