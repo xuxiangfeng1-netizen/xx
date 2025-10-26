@@ -4,15 +4,60 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Research Report on Hierarchical Text-Conditional Image Generation with CLIP Latents</title>
+
+<!-- MathJax for LaTeX-style equations -->
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+
 <style>
-body{font-family:"Helvetica","Arial",sans-serif;max-width:900px;margin:40px auto;line-height:1.6;color:#222;background:#fafafa}
-h1,h2,h3{color:#0a4d91}
-img{display:block;margin:20px auto;max-width:90%;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
-table{width:100%;border-collapse:collapse;margin:20px 0}
-th,td{border:1px solid #ccc;padding:8px;text-align:center}
-th{background:#f2f2f2}
-hr{border:0;height:1px;background:#ddd;margin:40px 0}
-.source{font-size:.9em;color:#555;text-align:center}
+body {
+  font-family: "Times New Roman", serif;
+  line-height: 1.7;
+  margin: 40px auto;
+  max-width: 900px;
+  background: #fafafa;
+  color: #222;
+}
+h1, h2, h3 {
+  color: #0a4d91;
+  font-weight: bold;
+}
+img {
+  display: block;
+  margin: 25px auto;
+  max-width: 90%;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+th {
+  background-color: #f2f2f2;
+}
+hr {
+  border: 0;
+  height: 1px;
+  background: #ddd;
+  margin: 40px 0;
+}
+.source {
+  font-size: 0.9em;
+  color: #666;
+  text-align: center;
+}
 </style>
 </head>
 <body>
@@ -21,108 +66,139 @@ hr{border:0;height:1px;background:#ddd;margin:40px 0}
 
 <h2>1. Research Background</h2>
 <p>
-In recent years, artificial intelligence has made significant breakthroughs in image generation.
-Traditional GANs perform well in synthesis but struggle with semantic consistency and diversity.
-OpenAI’s CLIP model, trained contrastively on massive image-text pairs, provides a unified multimodal representation space with strong zero-shot generalization.
-Based on CLIP’s representational power and Diffusion Models’ generative strength, the <b>unCLIP</b> framework achieves controllable, high-fidelity, semantically consistent, and diverse text-to-image generation.
+In recent years, artificial intelligence has made significant breakthroughs in the field of image generation.
+The traditional Generative Adversarial Network (GAN) performs well in image synthesis, but in text-to-image tasks,
+it often suffers from insufficient semantic consistency and limited diversity.
+Meanwhile, the <b>CLIP</b> (Contrastive Language–Image Pretraining) model learns through contrastive training on large image-text datasets,
+constructing a unified representation space for images and text and showing strong semantic understanding and zero-shot generalization ability.
+This study builds upon CLIP’s representational strength and combines it with the generative capability of Diffusion Models
+to propose a new hierarchical text-conditioned image generation framework, <b>unCLIP</b>.
+It achieves notable improvements in generation quality, diversity, and interpretability.
 </p>
 
 <h2>2. Research Objectives and Innovation Points</h2>
+<p>The core objective is to achieve controllable, high-fidelity, semantically consistent, and diverse text-to-image generation within the CLIP latent space.</p>
+
 <ol>
-<li><b>Two-stage Hierarchical Generation:</b>  
-Stage 1 — Prior model maps text to CLIP image embeddings.  
-Stage 2 — Decoder reconstructs images from embeddings.</li>
-<li><b>CLIP latent space as intermediate representation:</b> enables semantic editing and visualization.</li>
-<li><b>Diffusion Prior:</b> replaces autoregressive prior, improving efficiency and quality.</li>
-<li><b>Language-guided image manipulation (Text Diffs):</b> allows semantic-level edits via text prompts.</li>
+<li><b>Two-Stage Generation System (Hierarchical Generation):</b><br>
+Stage 1 – Prior model maps text to CLIP image embeddings.<br>
+Stage 2 – Decoder model decodes embeddings back into images.</li>
+
+<li><b>Introducing CLIP Latent Space as Intermediate Layer:</b>  
+Combines semantic understanding and image generation; enables semantic editing and visualization.</li>
+
+<li><b>Adopting Diffusion Prior instead of Autoregressive Prior:</b>  
+Improves training efficiency and image quality.</li>
+
+<li><b>Language-Guided Image Manipulation (Text Diffs):</b>  
+Allows hybrid or modified image generation via text semantics.</li>
 </ol>
 
 <h2>3. Model Architecture and Method</h2>
 <p>
-unCLIP divides text-to-image generation into two learnable subproblems:
+The <b>unCLIP</b> model is a two-stage hierarchical framework.
+Rather than directly generating pixels from text, it first produces a semantic representation in CLIP latent space,
+then reconstructs an image through diffusion decoding.  
+This decomposition simplifies text-to-image generation into two subproblems:
 </p>
+
 <ol>
-<li>Text → CLIP Embedding</li>
-<li>Embedding → Image</li>
+<li><b>Text → CLIP Embedding</b></li>
+<li><b>Embedding → Image</b></li>
 </ol>
 
 <h3>4. Model Overview</h3>
 <p>
-Prior Model — Generates CLIP embedding z<sub>i</sub> from text y: P(z<sub>i</sub>|y).  
-Decoder Model — Generates image x from embedding z<sub>i</sub> and y: P(x|z<sub>i</sub>, y).  
-Thus, P(x|y)=P(x|z<sub>i</sub>, y) P(z<sub>i</sub>|y).
+The overall architecture of <b>unCLIP</b> consists of two components:
 </p>
+
+<ul>
+  <li><b>Prior Model:</b> Responsible for generating a CLIP image embedding \( z_i \) from a text caption \( y \), i.e. \( P(z_i|y) \).</li>
+  <li><b>Decoder Model:</b> Uses a diffusion model to generate an image \( x \) from the CLIP image embedding, i.e. \( P(x|z_i, y) \).</li>
+</ul>
+
+<p>The overall conditional probability can therefore be expressed as:</p>
+
+<p style="text-align:center;font-size:1.3em;">
+  \( P(x|y) = P(x|z_i, y)\,P(z_i|y) \)
+</p>
+
 <img src="1.png" alt="unCLIP Model Overview">
-<p class="source">Figure 1 – unCLIP Model Overview.</p>
+<p class="source">Figure 1 – unCLIP Model Overview. The Prior maps text captions to CLIP embeddings, and the Diffusion Decoder reconstructs images conditioned on those embeddings.</p>
 
 <h3>5. Prior Model: Text-to-Image Embedding</h3>
+<p>
+The Prior model forms the first stage of unCLIP, transforming text embeddings into CLIP image embeddings.
+Two types of priors are considered:
+</p>
 <ul>
-<li><b>Autoregressive Prior:</b> accurate but slow (token prediction).</li>
-<li><b>Diffusion Prior:</b> continuous latent modeling, more efficient.</li>
+<li><b>Autoregressive Prior (AR):</b> Discretizes embeddings into tokens and predicts them autoregressively. Accurate but slow.</li>
+<li><b>Diffusion Prior:</b> Models continuous latent distributions; more efficient and higher quality.</li>
 </ul>
-<p>Classifier-free guidance randomly drops text conditioning for robustness and diversity.</p>
+<p>Classifier-free guidance randomly drops text conditioning to enhance diversity and robustness.</p>
 
 <h3>6. Decoder Model: Diffusion-Based Image Generation</h3>
 <p>
-The decoder iteratively denoises random noise into an image,
-conditioning on the CLIP embedding to reverse the diffusion process and produce realistic visuals.
+The decoder reverses a diffusion process to gradually denoise random noise into an image.
+Conditioned on the CLIP embedding, it iteratively reconstructs realistic outputs step-by-step.
 </p>
 
 <h3>7. Training Highlights</h3>
 <ul>
-<li>Dataset — 650 M text–image pairs.</li>
-<li>Classifier-Free Guidance — balances fidelity / diversity.</li>
-<li>Hierarchical Upsampling — 64 → 256 → 1024 px stages.</li>
-<li>PCA Optimization — reduces CLIP latent dimensionality.</li>
+<li><b>Dataset:</b> 650 M text–image pairs collected from the Internet.</li>
+<li><b>Classifier-Free Guidance:</b> Randomly drops conditioning to balance fidelity and diversity.</li>
+<li><b>Hierarchical Upsampling:</b> Generates progressively from \(64\times64\) to \(256\times256\) to \(1024\times1024\).</li>
+<li><b>PCA Optimization:</b> Reduces CLIP embedding dimensionality while preserving semantic richness.</li>
 </ul>
 
 <h2>8. Experiments and Results</h2>
 <p>
-unCLIP trained on ~650 M pairs (CLIP + DALL·E datasets).  
-FID = 10.39 on MS-COCO 256×256 ( better than GLIDE 12.24 and DALL·E 28 ).  
-Human evaluations confirm superior fidelity–diversity trade-off.
+unCLIP is trained on roughly 650 million text–image pairs.  
+On MS-COCO 256×256, unCLIP achieves FID = 10.39 ( vs GLIDE 12.24, DALL·E 28 ).  
+Both human and quantitative evaluations show that unCLIP attains an optimal balance between photorealism and diversity.
 </p>
+
 <img src="2.png" alt="unCLIP text-to-image examples">
 <p class="source">Figure 2 – Examples of unCLIP text-to-image generation and text-guided editing (Ramesh et al., 2022).</p>
 
-<h3>Comparative Results</h3>
+<h3>Quantitative Comparison</h3>
 <table>
 <tr><th>Model</th><th>Photorealism</th><th>Caption Similarity</th><th>Diversity</th></tr>
-<tr><td>GLIDE</td><td>52.9%</td><td>58.9%</td><td>37.4%</td></tr>
-<tr><td>unCLIP (AR Prior)</td><td>47.1%</td><td>41.1%</td><td>62.6%</td></tr>
-<tr><td><b>unCLIP (Diffusion Prior)</b></td><td><b>48.9%</b></td><td><b>45.3%</b></td><td><b>70.5%</b></td></tr>
+<tr><td>GLIDE</td><td>52.9 %</td><td>58.9 %</td><td>37.4 %</td></tr>
+<tr><td>unCLIP (AR Prior)</td><td>47.1 %</td><td>41.1 %</td><td>62.6 %</td></tr>
+<tr><td><b>unCLIP (Diffusion Prior)</b></td><td><b>48.9 %</b></td><td><b>45.3 %</b></td><td><b>70.5 %</b></td></tr>
 </table>
 
 <h2>9. Summary of Innovations</h2>
 <table>
 <tr><th>Innovation</th><th>Technique</th><th>Effect</th></tr>
 <tr><td>Hierarchical Generation</td><td>Text → Embedding → Image</td><td>Improves semantic consistency & diversity</td></tr>
-<tr><td>Diffusion Prior</td><td>Continuous latent modeling</td><td>Better efficiency & quality</td></tr>
+<tr><td>Diffusion Prior</td><td>Continuous latent modeling</td><td>Better efficiency and quality</td></tr>
 <tr><td>Latent Visualization</td><td>CLIP decoding + reconstruction</td><td>Enhances interpretability</td></tr>
-<tr><td>Classifier-Free Guidance</td><td>Conditional dropout</td><td>Balances fidelity & diversity</td></tr>
+<tr><td>Classifier-Free Guidance</td><td>Conditional dropout</td><td>Balances fidelity and diversity</td></tr>
 </table>
 
 <h2>10. Limitations and Risks</h2>
 <ul>
-<li>Attribute binding errors (e.g. color–object confusion)</li>
-<li>Distorted text rendering</li>
-<li>Loss of fine details in complex scenes</li>
-<li>Ethical risks — misinformation / misuse of realistic content</li>
+<li>Attribute binding errors (e.g. color–object mismatch).</li>
+<li>Distorted text rendering.</li>
+<li>Loss of fine details in complex scenes.</li>
+<li>Ethical concerns around realistic synthetic content.</li>
 </ul>
 <img src="3.png" alt="unCLIP limitations">
-<p class="source">Figure 3 – Limitations: attribute confusion, distorted text, detail loss (Ramesh et al., 2022).</p>
+<p class="source">Figure 3 – Examples of attribute confusion, distorted text, and detail loss (Ramesh et al., 2022).</p>
 
 <h2>11. Applications and Future Work</h2>
 <ul>
-<li>Integrated into OpenAI DALL·E 2 for art and media creation.</li>
-<li>Future directions: higher resolution training, better attribute binding, controllable latent editing, ethical watermarking.</li>
+<li>Integrated into OpenAI’s DALL·E 2 for creative media generation.</li>
+<li>Future directions: higher resolution training, improved attribute binding, controllable latent editing, and ethical watermarking mechanisms.</li>
 </ul>
 
 <h2>Conclusion</h2>
 <p>
-The unCLIP framework bridges semantic understanding and high-fidelity generation.  
-By leveraging CLIP latents and diffusion modeling, it achieves balanced accuracy, diversity, and interpretability—surpassing GLIDE and DALL·E.  
-Yet ethical transparency and responsible deployment remain essential as visual realism grows.
+The <b>unCLIP</b> framework bridges semantic understanding and high-fidelity generation.  
+By leveraging CLIP latent representations and diffusion modeling, it achieves a balance of accuracy, diversity, and interpretability—surpassing GLIDE and DALL·E in creativity and visual quality.  
+As image realism advances, ethical transparency and responsibility remain critical for safe deployment of generative AI.
 </p>
 
 <hr>
